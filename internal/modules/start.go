@@ -7,6 +7,8 @@
 package modules
 
 import (
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/Laky-64/gologging"
@@ -23,14 +25,23 @@ func init() {
 	helpTexts["/start"] = `<i>Start the bot and show main menu.</i>`
 }
 
-// InnoMusic sticker Bot API file ID.
+// ============================================================
+// START STICKER
+// ============================================================
+
 const startStickerID = "CAACAgUAAxkBAAEf9h1qRSPKlYwtAAFFrNVl-JWpojGWyT8AAjAJAAKJsAFXMkMs6wG9EwY8BA"
 
+// ============================================================
+// START HANDLER
+// ============================================================
+
 func startHandler(m *tg.NewMessage) error {
+
 	if m.ChatType() != tg.EntityUser {
+
 		database.AddServedChat(m.ChannelID())
 
-		m.Reply(
+		_, _ = m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
 
@@ -43,24 +54,24 @@ func startHandler(m *tg.NewMessage) error {
 
 	if arg != "" {
 		gologging.Info(
-			"Got Start parameter: "+arg+" in ChatID: "+utils.IntToStr(
-				m.ChannelID(),
-			),
+			"Got Start parameter: "+arg+" in ChatID: "+
+				utils.IntToStr(m.ChannelID()),
 		)
 	}
 
 	switch arg {
 
 	case "pm_help":
+
 		gologging.Info("User requested help via start param")
 
 		helpHandler(m)
 
 	default:
 
-		// ---------------------------------------------------------
-		// START ANIMATION
-		// ---------------------------------------------------------
+		// ====================================================
+		// ANIMATION 1
+		// ====================================================
 
 		msg1, _ := m.Respond(
 			"🌟 𝑾𝒆𝒍𝒄𝒐𝒎𝒆 𝑻𝒐 𝑳𝒐𝒗𝒆𝒍𝒍𝒚 𝑴𝒖𝒔𝒊𝒄 🌟",
@@ -73,6 +84,10 @@ func startHandler(m *tg.NewMessage) error {
 			_, _ = msg1.Delete()
 		}
 
+		// ====================================================
+		// ANIMATION 2
+		// ====================================================
+
 		msg2, _ := m.Respond(
 			"𓆩🎵𓆪 𝑩𝒆𝒔𝒕 𝑴𝒖𝒔𝒊𝒄 𝑬𝒙𝒑𝒆𝒓𝒊𝒆𝒏𝒄𝒆 𓆩🎵𓆪",
 			nil,
@@ -84,6 +99,10 @@ func startHandler(m *tg.NewMessage) error {
 			_, _ = msg2.Delete()
 		}
 
+		// ====================================================
+		// ANIMATION 3
+		// ====================================================
+
 		msg3, _ := m.Respond(
 			"💖𓆩🎶𓆪 𝑯𝒊𝒈𝒉 𝑸𝒖𝒂𝒍𝒊𝒕𝒚 𝑺𝒕𝒓𝒆𝒂𝒎𝒊𝒏𝒈 𓆩🎶𓆪💖",
 			nil,
@@ -94,6 +113,10 @@ func startHandler(m *tg.NewMessage) error {
 		if msg3 != nil {
 			_, _ = msg3.Delete()
 		}
+
+		// ====================================================
+		// ANIMATION 4
+		// ====================================================
 
 		msg4, _ := m.Respond(
 			`✨ ✦ 𝑷𝒐𝒘𝒆𝒓𝒆𝒅 𝑩𝒚 ✦ <a href="https://t.me/x_yuvii">𖹭 𝒀𝒖𝒗𝒊𝒊 𖹭</a> ✨`,
@@ -108,38 +131,72 @@ func startHandler(m *tg.NewMessage) error {
 			_, _ = msg4.Delete()
 		}
 
-		// ---------------------------------------------------------
-		// START STICKER
-		// ---------------------------------------------------------
+		// ====================================================
+		// STICKER
+		// ====================================================
+		//
+		// IMPORTANT:
+		// The supplied sticker ID is a Telegram Bot API
+		// file_id. Therefore we send it through the existing
+		// Bot API helper instead of gogram ResolveBotFileID().
+		//
+		// ====================================================
 
-		stickerMedia, stickerErr := tg.ResolveBotFileID(startStickerID)
+		var stickerResult struct {
+			Message struct {
+				MessageID int32 `json:"message_id"`
+			} `json:"message"`
+		}
+
+		stickerForm := url.Values{}
+
+		stickerForm.Set(
+			"chat_id",
+			strconv.FormatInt(m.ChannelID(), 10),
+		)
+
+		stickerForm.Set(
+			"sticker",
+			startStickerID,
+		)
+
+		stickerErr := botAPI(
+			"sendSticker",
+			stickerForm,
+			&stickerResult,
+		)
 
 		if stickerErr != nil {
+
 			gologging.Error(
-				"[start] Sticker file ID resolve failed: " +
+				"[start] Failed to send start sticker: " +
 					stickerErr.Error(),
 			)
+
 		} else {
 
-			stickerMsg, sendErr := m.ReplyMedia(stickerMedia)
+			// Keep sticker visible for 2.5 seconds.
+			time.Sleep(2500 * time.Millisecond)
 
-			if sendErr != nil {
-				gologging.Error(
-					"[start] Sticker reply failed: " +
-						sendErr.Error(),
+			if stickerResult.Message.MessageID != 0 {
+
+				deleteErr := botDelete(
+					m.ChannelID(),
+					stickerResult.Message.MessageID,
 				)
-			} else if stickerMsg != nil {
 
-				// Keep sticker for 2.5 seconds, then delete it.
-				time.Sleep(2500 * time.Millisecond)
-
-				_, _ = stickerMsg.Delete()
+				if deleteErr != nil {
+					gologging.Error(
+						"[start] Failed to delete sticker: " +
+							deleteErr.Error(),
+					)
+				}
 			}
 		}
 
-		// ---------------------------------------------------------
+		// ====================================================
 		// FINAL START MESSAGE
-		// ---------------------------------------------------------
+		// ====================================================
 
 		time.Sleep(1 * time.Second)
 
@@ -151,6 +208,10 @@ func startHandler(m *tg.NewMessage) error {
 				"bot":  utils.MentionHTML(m.Client.Me()),
 			},
 		)
+
+		// ====================================================
+		// START IMAGE
+		// ====================================================
 
 		_, err := m.RespondMedia(
 			&tg.InputMediaWebPage{
@@ -171,13 +232,18 @@ func startHandler(m *tg.NewMessage) error {
 					err.Error(),
 			)
 
-			// Fallback: send StartImage directly.
+			// ------------------------------------------------
+			// FALLBACK 1
+			// ------------------------------------------------
+
 			_, err = m.RespondMedia(
 				config.StartImage,
 				&tg.MediaOptions{
 					Caption:     caption,
 					NoForwards:  true,
-					ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+					ReplyMarkup: core.GetStartMarkup(
+						m.ChannelID(),
+					),
 				},
 			)
 
@@ -188,12 +254,17 @@ func startHandler(m *tg.NewMessage) error {
 						err.Error(),
 				)
 
-				// Final fallback: text only.
+				// --------------------------------------------
+				// FALLBACK 2
+				// --------------------------------------------
+
 				_, err = m.Respond(
 					caption,
 					&tg.SendOptions{
-						NoForwards:  true,
-						ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+						NoForwards: true,
+						ReplyMarkup: core.GetStartMarkup(
+							m.ChannelID(),
+						),
 					},
 				)
 
@@ -202,9 +273,9 @@ func startHandler(m *tg.NewMessage) error {
 		}
 	}
 
-	// -------------------------------------------------------------
+	// ========================================================
 	// LOGGER
-	// -------------------------------------------------------------
+	// ========================================================
 
 	if config.LoggerID != 0 && isLoggerEnabled() {
 
@@ -218,8 +289,8 @@ func startHandler(m *tg.NewMessage) error {
 			m.ChannelID(),
 			"logger_bot_started",
 			locales.Arg{
-				"mention":        utils.MentionHTML(m.Sender),
-				"user_id":        m.SenderID(),
+				"mention":       utils.MentionHTML(m.Sender),
+				"user_id":       m.SenderID(),
 				"user_username": uName,
 			},
 		)
@@ -230,8 +301,9 @@ func startHandler(m *tg.NewMessage) error {
 		)
 
 		if err != nil {
+
 			gologging.Error(
-				"Failed to send logger_bot_started msg, Err: " +
+				"Failed to send logger_bot_started msg, Err: "+
 					err.Error(),
 			)
 		}
@@ -240,9 +312,9 @@ func startHandler(m *tg.NewMessage) error {
 	return tg.ErrEndGroup
 }
 
-// -------------------------------------------------------------
+// ============================================================
 // START CALLBACK
-// -------------------------------------------------------------
+// ============================================================
 
 func startCB(cb *tg.CallbackQuery) error {
 
@@ -258,8 +330,10 @@ func startCB(cb *tg.CallbackQuery) error {
 	)
 
 	sendOpt := &tg.SendOptions{
-		ReplyMarkup: core.GetStartMarkup(cb.ChannelID()),
-		NoForwards:  true,
+		ReplyMarkup: core.GetStartMarkup(
+			cb.ChannelID(),
+		),
+		NoForwards: true,
 	}
 
 	if config.StartImage != "" {
