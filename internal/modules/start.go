@@ -43,24 +43,24 @@ func startHandler(m *tg.NewMessage) error {
 
 	if arg != "" {
 		gologging.Info(
-			"Got Start parameter: "+arg+" in ChatID: "+
-				utils.IntToStr(m.ChannelID()),
+			"Got Start parameter: "+arg+" in ChatID: "+utils.IntToStr(
+				m.ChannelID(),
+			),
 		)
 	}
 
 	switch arg {
 
 	case "pm_help":
-
 		gologging.Info("User requested help via start param")
 
 		helpHandler(m)
 
 	default:
 
-		// ==========================================
-		// START ANIMATION 1
-		// ==========================================
+		// ---------------------------------------------------------
+		// START ANIMATION
+		// ---------------------------------------------------------
 
 		msg1, _ := m.Respond(
 			"🌟 𝑾𝒆𝒍𝒄𝒐𝒎𝒆 𝑻𝒐 𝑳𝒐𝒗𝒆𝒍𝒍𝒚 𝑴𝒖𝒔𝒊𝒄 🌟",
@@ -70,17 +70,8 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg1 != nil {
-			if _, deleteErr := msg1.Delete(); deleteErr != nil {
-				gologging.Error(
-					"[start] Failed to delete animation message 1: " +
-						deleteErr.Error(),
-				)
-			}
+			_, _ = msg1.Delete()
 		}
-
-		// ==========================================
-		// START ANIMATION 2
-		// ==========================================
 
 		msg2, _ := m.Respond(
 			"𓆩🎵𓆪 𝑩𝒆𝒔𝒕 𝑴𝒖𝒔𝒊𝒄 𝑬𝒙𝒑𝒆𝒓𝒊𝒆𝒏𝒄𝒆 𓆩🎵𓆪",
@@ -90,17 +81,8 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg2 != nil {
-			if _, deleteErr := msg2.Delete(); deleteErr != nil {
-				gologging.Error(
-					"[start] Failed to delete animation message 2: " +
-						deleteErr.Error(),
-				)
-			}
+			_, _ = msg2.Delete()
 		}
-
-		// ==========================================
-		// START ANIMATION 3
-		// ==========================================
 
 		msg3, _ := m.Respond(
 			"💖𓆩🎶𓆪 𝑯𝒊𝒈𝒉 𝑸𝒖𝒂𝒍𝒊𝒕𝒚 𝑺𝒕𝒓𝒆𝒂𝒎𝒊𝒏𝒈 𓆩🎶𓆪💖",
@@ -110,17 +92,8 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg3 != nil {
-			if _, deleteErr := msg3.Delete(); deleteErr != nil {
-				gologging.Error(
-					"[start] Failed to delete animation message 3: " +
-						deleteErr.Error(),
-				)
-			}
+			_, _ = msg3.Delete()
 		}
-
-		// ==========================================
-		// START ANIMATION 4
-		// ==========================================
 
 		msg4, _ := m.Respond(
 			`✨ ✦ 𝑷𝒐𝒘𝒆𝒓𝒆𝒅 𝑩𝒚 ✦ <a href="https://t.me/x_yuvii">𖹭 𝒀𝒖𝒗𝒊𝒊 𖹭</a> ✨`,
@@ -132,57 +105,41 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg4 != nil {
-			if _, deleteErr := msg4.Delete(); deleteErr != nil {
-				gologging.Error(
-					"[start] Failed to delete animation message 4: " +
-						deleteErr.Error(),
-				)
-			}
+			_, _ = msg4.Delete()
 		}
 
-		// ==========================================
-		// INNOMUSIC STICKER
-		// ==========================================
+		// ---------------------------------------------------------
+		// START STICKER
+		// ---------------------------------------------------------
 
-		stickerMedia, stickerResolveErr :=
-			tg.MessageMedia.ResolveBotFileID(startStickerID)
+		stickerMedia, stickerErr := tg.ResolveBotFileID(startStickerID)
 
-		if stickerResolveErr != nil {
-
+		if stickerErr != nil {
 			gologging.Error(
 				"[start] Sticker file ID resolve failed: " +
-					stickerResolveErr.Error(),
+					stickerErr.Error(),
 			)
-
 		} else {
 
-			stickerMsg, stickerSendErr :=
-				m.ReplyMedia(stickerMedia)
+			stickerMsg, sendErr := m.ReplyMedia(stickerMedia)
 
-			if stickerSendErr != nil {
-
+			if sendErr != nil {
 				gologging.Error(
 					"[start] Sticker reply failed: " +
-						stickerSendErr.Error(),
+						sendErr.Error(),
 				)
-
 			} else if stickerMsg != nil {
 
-				// Keep sticker visible for 2.5 seconds.
+				// Keep sticker for 2.5 seconds, then delete it.
 				time.Sleep(2500 * time.Millisecond)
 
-				if _, stickerDeleteErr := stickerMsg.Delete(); stickerDeleteErr != nil {
-					gologging.Error(
-						"[start] Failed to delete sticker: " +
-							stickerDeleteErr.Error(),
-					)
-				}
+				_, _ = stickerMsg.Delete()
 			}
 		}
 
-		// ==========================================
+		// ---------------------------------------------------------
 		// FINAL START MESSAGE
-		// ==========================================
+		// ---------------------------------------------------------
 
 		time.Sleep(1 * time.Second)
 
@@ -195,11 +152,7 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		// ==========================================
-		// SEND START IMAGE
-		// ==========================================
-
-		_, mediaErr := m.RespondMedia(
+		_, err := m.RespondMedia(
 			&tg.InputMediaWebPage{
 				URL:             config.StartImage,
 				ForceLargeMedia: true,
@@ -211,18 +164,15 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		if mediaErr != nil {
+		if err != nil {
 
 			gologging.Error(
-				"[start] InputMediaWebPage reply failed: " +
-					mediaErr.Error(),
+				"[start] InputMediaWebPage Reply failed: " +
+					err.Error(),
 			)
 
-			// ==========================================
-			// FALLBACK 1
-			// ==========================================
-
-			_, fallbackErr := m.RespondMedia(
+			// Fallback: send StartImage directly.
+			_, err = m.RespondMedia(
 				config.StartImage,
 				&tg.MediaOptions{
 					Caption:     caption,
@@ -231,18 +181,15 @@ func startHandler(m *tg.NewMessage) error {
 				},
 			)
 
-			if fallbackErr != nil {
+			if err != nil {
 
 				gologging.Error(
 					"[start] URL media reply failed: " +
-						fallbackErr.Error(),
+						err.Error(),
 				)
 
-				// ==========================================
-				// FALLBACK 2 - TEXT ONLY
-				// ==========================================
-
-				_, textErr := m.Respond(
+				// Final fallback: text only.
+				_, err = m.Respond(
 					caption,
 					&tg.SendOptions{
 						NoForwards:  true,
@@ -250,16 +197,14 @@ func startHandler(m *tg.NewMessage) error {
 					},
 				)
 
-				if textErr != nil {
-					return textErr
-				}
+				return err
 			}
 		}
 	}
 
-	// ==========================================
+	// -------------------------------------------------------------
 	// LOGGER
-	// ==========================================
+	// -------------------------------------------------------------
 
 	if config.LoggerID != 0 && isLoggerEnabled() {
 
@@ -273,21 +218,21 @@ func startHandler(m *tg.NewMessage) error {
 			m.ChannelID(),
 			"logger_bot_started",
 			locales.Arg{
-				"mention":       utils.MentionHTML(m.Sender),
-				"user_id":       m.SenderID(),
+				"mention":        utils.MentionHTML(m.Sender),
+				"user_id":        m.SenderID(),
 				"user_username": uName,
 			},
 		)
 
-		_, loggerErr := m.Client.SendMessage(
+		_, err := m.Client.SendMessage(
 			config.LoggerID,
 			msg,
 		)
 
-		if loggerErr != nil {
+		if err != nil {
 			gologging.Error(
 				"Failed to send logger_bot_started msg, Err: " +
-					loggerErr.Error(),
+					err.Error(),
 			)
 		}
 	}
@@ -295,9 +240,9 @@ func startHandler(m *tg.NewMessage) error {
 	return tg.ErrEndGroup
 }
 
-// ==========================================
+// -------------------------------------------------------------
 // START CALLBACK
-// ==========================================
+// -------------------------------------------------------------
 
 func startCB(cb *tg.CallbackQuery) error {
 
