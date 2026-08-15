@@ -38,10 +38,9 @@ const startStickerID = "CAACAgUAAxkBAAEf9h1qRSPKlYwtAAFFrNVl-JWpojGWyT8AAjAJAAKJ
 func startHandler(m *tg.NewMessage) error {
 
 	if m.ChatType() != tg.EntityUser {
-
 		database.AddServedChat(m.ChannelID())
 
-		_, _ = m.Reply(
+		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
 
@@ -68,6 +67,61 @@ func startHandler(m *tg.NewMessage) error {
 		helpHandler(m)
 
 	default:
+
+		// ====================================================
+		// STICKER FIRST
+		// ====================================================
+
+		var stickerResult struct {
+			Message struct {
+				MessageID int32 `json:"message_id"`
+			} `json:"message"`
+		}
+
+		stickerForm := url.Values{}
+
+		stickerForm.Set(
+			"chat_id",
+			strconv.FormatInt(m.ChannelID(), 10),
+		)
+
+		stickerForm.Set(
+			"sticker",
+			startStickerID,
+		)
+
+		stickerErr := botAPI(
+			"sendSticker",
+			stickerForm,
+			&stickerResult,
+		)
+
+		if stickerErr != nil {
+
+			gologging.Error(
+				"[start] Failed to send start sticker: "+
+					stickerErr.Error(),
+			)
+
+		} else {
+
+			// Sticker visible for 2.5 seconds.
+			time.Sleep(2500 * time.Millisecond)
+
+			if stickerResult.Message.MessageID != 0 {
+
+				if deleteErr := botDelete(
+					m.ChannelID(),
+					stickerResult.Message.MessageID,
+				); deleteErr != nil {
+
+					gologging.Error(
+						"[start] Failed to delete start sticker: "+
+							deleteErr.Error(),
+					)
+				}
+			}
+		}
 
 		// ====================================================
 		// ANIMATION 1
@@ -132,69 +186,6 @@ func startHandler(m *tg.NewMessage) error {
 		}
 
 		// ====================================================
-		// STICKER
-		// ====================================================
-		//
-		// IMPORTANT:
-		// The supplied sticker ID is a Telegram Bot API
-		// file_id. Therefore we send it through the existing
-		// Bot API helper instead of gogram ResolveBotFileID().
-		//
-		// ====================================================
-
-		var stickerResult struct {
-			Message struct {
-				MessageID int32 `json:"message_id"`
-			} `json:"message"`
-		}
-
-		stickerForm := url.Values{}
-
-		stickerForm.Set(
-			"chat_id",
-			strconv.FormatInt(m.ChannelID(), 10),
-		)
-
-		stickerForm.Set(
-			"sticker",
-			startStickerID,
-		)
-
-		stickerErr := botAPI(
-			"sendSticker",
-			stickerForm,
-			&stickerResult,
-		)
-
-		if stickerErr != nil {
-
-			gologging.Error(
-				"[start] Failed to send start sticker: " +
-					stickerErr.Error(),
-			)
-
-		} else {
-
-			// Keep sticker visible for 2.5 seconds.
-			time.Sleep(2500 * time.Millisecond)
-
-			if stickerResult.Message.MessageID != 0 {
-
-				deleteErr := botDelete(
-					m.ChannelID(),
-					stickerResult.Message.MessageID,
-				)
-
-				if deleteErr != nil {
-					gologging.Error(
-						"[start] Failed to delete sticker: " +
-							deleteErr.Error(),
-					)
-				}
-			}
-		}
-
-		// ====================================================
 		// FINAL START MESSAGE
 		// ====================================================
 
@@ -209,10 +200,6 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		// ====================================================
-		// START IMAGE
-		// ====================================================
-
 		_, err := m.RespondMedia(
 			&tg.InputMediaWebPage{
 				URL:             config.StartImage,
@@ -221,21 +208,20 @@ func startHandler(m *tg.NewMessage) error {
 			&tg.MediaOptions{
 				Caption:     caption,
 				NoForwards:  true,
-				ReplyMarkup: core.GetStartMarkup(m.ChannelID()),
+				ReplyMarkup: core.GetStartMarkup(
+					m.ChannelID(),
+				),
 			},
 		)
 
 		if err != nil {
 
 			gologging.Error(
-				"[start] InputMediaWebPage Reply failed: " +
+				"[start] InputMediaWebPage Reply failed: "+
 					err.Error(),
 			)
 
-			// ------------------------------------------------
-			// FALLBACK 1
-			// ------------------------------------------------
-
+			// Fallback 1
 			_, err = m.RespondMedia(
 				config.StartImage,
 				&tg.MediaOptions{
@@ -250,14 +236,11 @@ func startHandler(m *tg.NewMessage) error {
 			if err != nil {
 
 				gologging.Error(
-					"[start] URL media reply failed: " +
+					"[start] URL media reply failed: "+
 						err.Error(),
 				)
 
-				// --------------------------------------------
-				// FALLBACK 2
-				// --------------------------------------------
-
+				// Fallback 2
 				_, err = m.Respond(
 					caption,
 					&tg.SendOptions{
