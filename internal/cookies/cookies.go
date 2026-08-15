@@ -31,10 +31,11 @@ var (
 func init() {
 	gologging.Debug("🔹 Initializing cookies...")
 
-	// Cookie files are optional.
-	// They can be downloaded through CookiesLink if configured.
-	urls := strings.Fields(config.CookiesLink)
+	if err := copyEmbeddedCookies(); err != nil {
+		gologging.Fatal("Failed to copy embedded cookies:", err)
+	}
 
+	urls := strings.Fields(config.CookiesLink)
 	for _, url := range urls {
 		if err := downloadCookieFile(url); err != nil {
 			gologging.WarnF(
@@ -46,20 +47,22 @@ func init() {
 	}
 }
 
+// copyEmbeddedCookies is intentionally a no-op.
+// Cookie files are optional and can be supplied through CookiesLink.
+// Keeping cookie data out of the Go embed pattern also makes Docker builds
+// independent of whether optional .txt cookie files are present in the build context.
+func copyEmbeddedCookies() error {
+	return nil
+}
+
 func downloadCookieFile(url string) error {
 	id := filepath.Base(url)
-
-	if id == "" || id == "." || id == "/" {
-		return fmt.Errorf("invalid cookie URL: %s", url)
-	}
-
 	rawURL := "https://batbin.me/raw/" + id
 	filePath := filepath.Join(cookieDir, id+".txt")
 
 	resp, err := client.R().
 		SetOutputFileName(filePath).
 		Get(rawURL)
-
 	if err != nil {
 		return err
 	}
@@ -83,12 +86,11 @@ func loadCookieCache() error {
 
 	var filtered []string
 
-	for _, file := range files {
-		if filepath.Base(file) == "example.txt" {
+	for _, f := range files {
+		if filepath.Base(f) == "example.txt" {
 			continue
 		}
-
-		filtered = append(filtered, file)
+		filtered = append(filtered, f)
 	}
 
 	cachedFiles = filtered
@@ -103,10 +105,7 @@ func GetRandomCookieFile() (string, error) {
 	})
 
 	if err != nil {
-		gologging.WarnF(
-			"Failed to load cookie cache: %v",
-			err,
-		)
+		gologging.WarnF("Failed to load cookie cache: %v", err)
 		return "", err
 	}
 
