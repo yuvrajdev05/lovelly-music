@@ -19,74 +19,48 @@ import (
 	"main/internal/utils"
 )
 
-const startStickerID = "CAACAgUAAxkBAAEf9h1qRSPKlYwtAAFFrNVl-JWpojGWyT8AAjAJAAKJsAFXMkMs6wG9EwY8BA"
-
 func init() {
 	helpTexts["/start"] = `<i>Start the bot and show main menu.</i>`
 }
 
+// InnoMusic sticker Bot API file ID.
+const startStickerID = "CAACAgUAAxkBAAEf9h1qRSPKlYwtAAFFrNVl-JWpojGWyT8AAjAJAAKJsAFXMkMs6wG9EwY8BA"
+
 func startHandler(m *tg.NewMessage) error {
 	if m.ChatType() != tg.EntityUser {
 		database.AddServedChat(m.ChannelID())
+
 		m.Reply(
 			F(m.ChannelID(), "start_group"),
 		)
+
 		return tg.ErrEndGroup
 	}
 
 	arg := m.Args()
+
 	database.AddServedUser(m.ChannelID())
 
 	if arg != "" {
 		gologging.Info(
-			"Got Start parameter: " + arg + " in ChatID: " + utils.IntToStr(
-				m.ChannelID(),
-			),
+			"Got Start parameter: "+arg+" in ChatID: "+
+				utils.IntToStr(m.ChannelID()),
 		)
 	}
 
 	switch arg {
+
 	case "pm_help":
+
 		gologging.Info("User requested help via start param")
+
 		helpHandler(m)
 
 	default:
 
-		// -------------------------------------------------
-		// INNOMUSIC STICKER REPLY
-		// -------------------------------------------------
-		sticker, err := tg.ResolveBotFileID(startStickerID)
-
-		if err != nil {
-			gologging.Error(
-				"[start] Failed to resolve sticker: " + err.Error(),
-			)
-		} else {
-			stickerMsg, err := m.ReplyMedia(
-				sticker,
-				&tg.MediaOptions{
-					NoForwards: true,
-				},
-			)
-
-			if err != nil {
-				gologging.Error(
-					"[start] Failed to send sticker: " + err.Error(),
-				)
-			} else if stickerMsg != nil {
-				time.Sleep(2500 * time.Millisecond)
-
-				if err := stickerMsg.Delete(); err != nil {
-					gologging.Error(
-						"[start] Failed to delete sticker: " + err.Error(),
-					)
-				}
-			}
-		}
-
-		// -------------------------------------------------
-		// START ANIMATION
-		// -------------------------------------------------
+		// ==========================================
+		// START ANIMATION 1
+		// ==========================================
 
 		msg1, _ := m.Respond(
 			"🌟 𝑾𝒆𝒍𝒄𝒐𝒎𝒆 𝑻𝒐 𝑳𝒐𝒗𝒆𝒍𝒍𝒚 𝑴𝒖𝒔𝒊𝒄 🌟",
@@ -96,8 +70,17 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg1 != nil {
-			msg1.Delete()
+			if _, deleteErr := msg1.Delete(); deleteErr != nil {
+				gologging.Error(
+					"[start] Failed to delete animation message 1: " +
+						deleteErr.Error(),
+				)
+			}
 		}
+
+		// ==========================================
+		// START ANIMATION 2
+		// ==========================================
 
 		msg2, _ := m.Respond(
 			"𓆩🎵𓆪 𝑩𝒆𝒔𝒕 𝑴𝒖𝒔𝒊𝒄 𝑬𝒙𝒑𝒆𝒓𝒊𝒆𝒏𝒄𝒆 𓆩🎵𓆪",
@@ -107,8 +90,17 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg2 != nil {
-			msg2.Delete()
+			if _, deleteErr := msg2.Delete(); deleteErr != nil {
+				gologging.Error(
+					"[start] Failed to delete animation message 2: " +
+						deleteErr.Error(),
+				)
+			}
 		}
+
+		// ==========================================
+		// START ANIMATION 3
+		// ==========================================
 
 		msg3, _ := m.Respond(
 			"💖𓆩🎶𓆪 𝑯𝒊𝒈𝒉 𝑸𝒖𝒂𝒍𝒊𝒕𝒚 𝑺𝒕𝒓𝒆𝒂𝒎𝒊𝒏𝒈 𓆩🎶𓆪💖",
@@ -118,8 +110,17 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg3 != nil {
-			msg3.Delete()
+			if _, deleteErr := msg3.Delete(); deleteErr != nil {
+				gologging.Error(
+					"[start] Failed to delete animation message 3: " +
+						deleteErr.Error(),
+				)
+			}
 		}
+
+		// ==========================================
+		// START ANIMATION 4
+		// ==========================================
 
 		msg4, _ := m.Respond(
 			`✨ ✦ 𝑷𝒐𝒘𝒆𝒓𝒆𝒅 𝑩𝒚 ✦ <a href="https://t.me/x_yuvii">𖹭 𝒀𝒖𝒗𝒊𝒊 𖹭</a> ✨`,
@@ -131,14 +132,59 @@ func startHandler(m *tg.NewMessage) error {
 		time.Sleep(1 * time.Second)
 
 		if msg4 != nil {
-			msg4.Delete()
+			if _, deleteErr := msg4.Delete(); deleteErr != nil {
+				gologging.Error(
+					"[start] Failed to delete animation message 4: " +
+						deleteErr.Error(),
+				)
+			}
 		}
 
-		time.Sleep(1 * time.Second)
+		// ==========================================
+		// INNOMUSIC STICKER
+		// ==========================================
 
-		// -------------------------------------------------
-		// START MENU
-		// -------------------------------------------------
+		stickerMedia, stickerResolveErr :=
+			tg.MessageMedia.ResolveBotFileID(startStickerID)
+
+		if stickerResolveErr != nil {
+
+			gologging.Error(
+				"[start] Sticker file ID resolve failed: " +
+					stickerResolveErr.Error(),
+			)
+
+		} else {
+
+			stickerMsg, stickerSendErr :=
+				m.ReplyMedia(stickerMedia)
+
+			if stickerSendErr != nil {
+
+				gologging.Error(
+					"[start] Sticker reply failed: " +
+						stickerSendErr.Error(),
+				)
+
+			} else if stickerMsg != nil {
+
+				// Keep sticker visible for 2.5 seconds.
+				time.Sleep(2500 * time.Millisecond)
+
+				if _, stickerDeleteErr := stickerMsg.Delete(); stickerDeleteErr != nil {
+					gologging.Error(
+						"[start] Failed to delete sticker: " +
+							stickerDeleteErr.Error(),
+					)
+				}
+			}
+		}
+
+		// ==========================================
+		// FINAL START MESSAGE
+		// ==========================================
+
+		time.Sleep(1 * time.Second)
 
 		caption := F(
 			m.ChannelID(),
@@ -149,7 +195,11 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		_, err := m.RespondMedia(
+		// ==========================================
+		// SEND START IMAGE
+		// ==========================================
+
+		_, mediaErr := m.RespondMedia(
 			&tg.InputMediaWebPage{
 				URL:             config.StartImage,
 				ForceLargeMedia: true,
@@ -161,12 +211,18 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		if err != nil {
+		if mediaErr != nil {
+
 			gologging.Error(
-				"[start] InputMediaWebPage Reply failed: " + err.Error(),
+				"[start] InputMediaWebPage reply failed: " +
+					mediaErr.Error(),
 			)
 
-			_, err = m.RespondMedia(
+			// ==========================================
+			// FALLBACK 1
+			// ==========================================
+
+			_, fallbackErr := m.RespondMedia(
 				config.StartImage,
 				&tg.MediaOptions{
 					Caption:     caption,
@@ -175,12 +231,18 @@ func startHandler(m *tg.NewMessage) error {
 				},
 			)
 
-			if err != nil {
+			if fallbackErr != nil {
+
 				gologging.Error(
-					"[start] URL media reply failed: " + err.Error(),
+					"[start] URL media reply failed: " +
+						fallbackErr.Error(),
 				)
 
-				_, err = m.Respond(
+				// ==========================================
+				// FALLBACK 2 - TEXT ONLY
+				// ==========================================
+
+				_, textErr := m.Respond(
 					caption,
 					&tg.SendOptions{
 						NoForwards:  true,
@@ -188,16 +250,19 @@ func startHandler(m *tg.NewMessage) error {
 					},
 				)
 
-				return err
+				if textErr != nil {
+					return textErr
+				}
 			}
 		}
 	}
 
-	// -------------------------------------------------
+	// ==========================================
 	// LOGGER
-	// -------------------------------------------------
+	// ==========================================
 
 	if config.LoggerID != 0 && isLoggerEnabled() {
+
 		uName := "N/A"
 
 		if m.Sender.Username != "" {
@@ -214,14 +279,15 @@ func startHandler(m *tg.NewMessage) error {
 			},
 		)
 
-		_, err := m.Client.SendMessage(
+		_, loggerErr := m.Client.SendMessage(
 			config.LoggerID,
 			msg,
 		)
 
-		if err != nil {
+		if loggerErr != nil {
 			gologging.Error(
-				"Failed to send logger_bot_started msg, Err: " + err.Error(),
+				"Failed to send logger_bot_started msg, Err: " +
+					loggerErr.Error(),
 			)
 		}
 	}
@@ -229,7 +295,12 @@ func startHandler(m *tg.NewMessage) error {
 	return tg.ErrEndGroup
 }
 
+// ==========================================
+// START CALLBACK
+// ==========================================
+
 func startCB(cb *tg.CallbackQuery) error {
+
 	cb.Answer("")
 
 	caption := F(
@@ -247,13 +318,17 @@ func startCB(cb *tg.CallbackQuery) error {
 	}
 
 	if config.StartImage != "" {
+
 		sendOpt.Media = &tg.InputMediaWebPage{
 			URL:             config.StartImage,
 			ForceLargeMedia: true,
 		}
 	}
 
-	cb.Edit(caption, sendOpt)
+	cb.Edit(
+		caption,
+		sendOpt,
+	)
 
 	return tg.ErrEndGroup
 }
