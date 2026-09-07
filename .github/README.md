@@ -41,7 +41,7 @@ Click the button below to deploy **YuviMusic** instantly on Heroku:
 
 1. **Clone Repository**
 ```bash
-git clone https://github.com/tusar404/ArcMusic.git
+git clone https://github.com/yuvrajdev05/lovelly-music.git
 cd ArcMusic
 ```
 
