@@ -1,24 +1,10 @@
-<h1 align="center">🎧 <b>ArcMusic</b>(<a href="https://telegram.dog/ArcTunesBot">@ArcTunesBot</a>)</h1>
+<h1 align="center">🎧 <b>yuviMusic</b>(<a href="https://telegram.dog/ArcTunesBot">@yuvi_botes</a>)</h1>
 
 <p align="center">
   <b>Telegram Group Calls Streaming Bot</b><br>
   Supports YouTube, Spotify, Jio Savan, SoundCloud and M3U8 links.<br><br>
 
-  <a href="https://go.dev/">
-    <img src="https://img.shields.io/badge/Go-1.25-00ADD8?style=for-the-badge&logo=go&labelColor=000000&logoColor=white" alt="Go Version">
-  </a>
-  <a href="https://github.com/tusar404/ArcMusic/releases/tag/v1.0.0">
-    <img src="https://img.shields.io/badge/Version-v1.0.0-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
-  </a>
-  <a href="../LICENSE">
-    <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
-  </a>
-  <a href="https://github.com/tusar404/ArcMusic/stargazers">
-    <img src="https://img.shields.io/github/stars/tusar404/ArcMusic?style=for-the-badge&label=Stars&labelColor=000000&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
-  </a>
-  <a href="https://github.com/tusar404/ArcMusic/fork">
-    <img src="https://img.shields.io/github/forks/tusar404/ArcMusic?style=for-the-badge&label=Forks&labelColor=000000&color=00C853&logo=github&logoColor=white" alt="GitHub Forks">
-  </a>
+
 
 </p>
 
@@ -36,9 +22,9 @@ A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in
 
 ### ☁️ Deploy to Heroku (One-Click)
 
-Click the button below to deploy **ArcMusic** instantly on Heroku:
+Click the button below to deploy **YuviMusic** instantly on Heroku:
 
-<a href="https://heroku.com/deploy?template=https://github.com/tusar404/ArcMusic">
+<a href="https://heroku.com/deploy?template=https://github.com/yuvrajdev05/lovelly-music">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku">
 </a>
 
@@ -73,7 +59,7 @@ vi .env # Edit .env with your credentials
 4. **Get Required Credentials**
 - **Bot Token**: Message [@BotFather](https://t.me/BotFather), use `/newbot`
 - **API ID & Hash**: Visit [my.telegram.org](https://my.telegram.org)
-- **Session String**: Use [@StringFatherBot](https://t.me/StringFatherBot) or online generator
+- **Session String**: Use [@StringFatherBot](https://t.me/StringSessionGennBot) or online generator
 - **MongoDB**: Free tier at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 - **API Key**: Visit [Arc API Dashboard](https://portal.arcmusic.fun/register)
 
@@ -228,9 +214,9 @@ ArcMusic/
 
 ## 🐍 Python Version (Anon Branch)
 
-Looking for a Python-based alternative? We have an updated version based on the popular [AnonXMusic](https://github.com/AnonymousX1025/AnonXMusic) repository. This branch has been enhanced and natively implements the **Arc API** for downloading YouTube media.
+Looking for a Python-based alternative? We have an updated version based on the popular [AnonXMusic](https://github.com/yuvrajdev05/lovelly-music) repository. This branch has been enhanced and natively implements the **Arc API** for downloading YouTube media.
 
-👉 **[Access the Python (AnonXMusic) source code here!](https://github.com/tusar404/ArcMusic/tree/anon)**
+👉 **[Access the Python (AnonXMusic) source code here!](https://github.com/yuvrajdev05/lovelly-music/tree/anon)**
 
 ---
 
@@ -239,7 +225,7 @@ Looking for a Python-based alternative? We have an updated version based on the 
 Facing issue in any feature? or Have a feature request?
 
 - **Join our [Support Chat](https://t.me/ArcChatz)** for discussions
-- **Open an [Issue on GitHub](https://github.com/tusar404/ArcMusic/issues)**
+- **Open an [Issue on GitHub](https://github.com/yuvrajdev05/lovelly-music/issues)**
 
 ---
 
@@ -276,7 +262,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 ## 🙌 Credits
 
-- **Maintainer**: [Tosu](https://github.com/tusar404)
+- **Maintainer**: [Tosu](https://github.com/yuvrajdev05)
 - **Contributors**: All amazing developers who contributed to this project
 - **Base Repo**: [YukkiMusic](https://github.com/TheTeamVivek/YukkiMusic)
 - **Libraries**: Built with [gogram](https://github.com/AmarnathCJD/gogram), [ntgcalls](https://github.com/pytgcalls/ntgcalls), and more
@@ -285,9 +271,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 ## 📞 Support
 
-- **Telegram Support Chat**: [@ArcChatz](https://telegram.dog/ArcChatz)
-- **Updates Channel**: [@ArcUpdates](https://telegram.dog/ArcUpdates)
-- **GitHub Issues**: [Report bugs](https://github.com/tusar404/ArcMusic/issues)
+- **Telegram Support Chat**: [@mad_x_yuvi](https://telegram.dog/mad_x_yuvi)
+- **Updates Channel**:  [@yuvi_botes](https://telegram.dog/yuvi_botes)
+- **GitHub Issues**: [Report bugs](https://github.com/yuvrajdev05/lovelly-music/issues)
 
 ---
 
