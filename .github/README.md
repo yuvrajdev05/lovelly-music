@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">
-<img src="https://github.com/tusar404/ArcMusic/blob/anon/.github/arc.jpg" width="720" height="auto">
+<img src="https://github.com/yuvrajdev05/lovelly-music/blob/anon/.github/arc.jpg" width="720" height="auto">
 </div>
 <p align="center">
 A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group calls — built with Go.
